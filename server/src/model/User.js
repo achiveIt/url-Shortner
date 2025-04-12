@@ -24,8 +24,24 @@ userSchema.pre('save', async function (next) {
 });
 
 //check the password
-userSchema.methods.comparePassword = async function (input) {
+userSchema.methods.isPasswordCorrect = async function (input) {
     return bcrypt.compare(input, this.password);
 };
+
+
+userSchema.methods.generateAccessToken = function(){
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    )
+}
+
 
 export const User =  mongoose.model('User', userSchema);
