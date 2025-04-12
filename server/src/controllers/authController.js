@@ -1,9 +1,13 @@
-import User from '../models/User.js';
+import {User} from '../models/user.js';
+import ApiError from '../utils/ApiError.js';
+import ApiResponse from '../utils/ApiResponse.js';
 
 const generateAccessToken = async (userId) => {
     try {
         const user = await User.findById(userId)
         const accessToken = user.generateAccessToken()
+        console.log(accessToken);
+        
 
         return {accessToken}
     } catch (error) {
@@ -37,11 +41,11 @@ export const login = async (req, res) => {
         }
 
         const {accessToken} = await generateAccessToken(user._id)
-
+        console.log(accessToken);
+        
         const options = {
             httpOnly: true,
-            secure: true,
-            sameSite: 'None'
+            secure: false,
         }
         
         return res
@@ -49,6 +53,8 @@ export const login = async (req, res) => {
             .cookie("accessToken", accessToken, options)
             .json(new ApiResponse(200,{},"Logged in successfully!!"))
     } catch (err) {
+        console.log(err);
+        
         throw new ApiError(500, "Error while login")
     }
 };
