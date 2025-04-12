@@ -2,6 +2,7 @@ import express from 'express'
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoute.js';
 import bodyParser from 'body-parser';
+import linkRoutes from './routes/linkRoute.js'
 import cors from 'cors'
 
 const app = express();
@@ -14,5 +15,6 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/links', linkRoutes);
 
 export {app}
