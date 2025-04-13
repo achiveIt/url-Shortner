@@ -10,7 +10,7 @@ import cors from 'cors'
 
 const app = express();
 const corsOptions = {
-    origin: 'https://url-shortner-rouge-six.vercel.app/',
+    origin: 'https://url-shortner-rouge-six.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'PATCH'], 
     credentials: true,               
   };
