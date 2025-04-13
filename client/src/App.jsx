@@ -1,9 +1,9 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import CreateLink from './pages/createLink';
-import Analytics from './pages/Analytics';
-import Login from './pages/Login';
+import Dashboard from './pages/Dashboard.jsx';
+import CreateLink from './pages/createLink.jsx';
+import Analytics from './pages/Analytics.jsx';
+import Login from './pages/Login.jsx';
 
 function App() {
   return (
