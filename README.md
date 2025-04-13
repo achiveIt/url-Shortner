@@ -7,6 +7,9 @@ A full-stack MERN (MongoDB, Express, React, Node) application to shorten URLs, t
 As of now only a default user can login, but this functionality is extendible 
 username: intern@dacoid.com, password: Test123
 
+## LIVE PROJECT 
+[https://url-shortner-rouge-six.vercel.app/](https://url-shortner-rouge-six.vercel.app/)
+
 ## Features
 
 - Shorten long URLs with optional custom alias and expiration date
