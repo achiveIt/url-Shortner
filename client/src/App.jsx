@@ -1,7 +1,7 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard.jsx';
-import CreateLink from './pages/createLink.jsx';
+import CreateLink from './pages/CreateLink.jsx';
 import Analytics from './pages/Analytics.jsx';
 import Login from './pages/Login.jsx';
 
