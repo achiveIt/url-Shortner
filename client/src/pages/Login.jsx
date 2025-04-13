@@ -1,28 +1,38 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../redux/slices/authSlice';
-import api from '../utils/api';
+import { SERVER_BASE_URL } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(null);
         try {
-            const res = await api.post('/auth/login', { email, password });
-            dispatch(loginSuccess(res.data));
+            const res = await fetch(`${SERVER_BASE_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', 
+                body: JSON.stringify({ email, password }),
+            });
+    
+            if (!res.ok) {
+                throw new Error('Invalid credentials');
+            }
+    
+            console.log("redirecting to dashboard..");
             navigate('/dashboard');
         } catch (err) {
-            setError('Invalid credentials', err);
+            console.error(err);
+            setError('Invalid credentials');
         }
     };
-
+    
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-full max-w-md">
