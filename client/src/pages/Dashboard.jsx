@@ -26,45 +26,44 @@ export default function Dashboard() {
     const [loadingQr, setLoadingQr] = useState(false);
     const [error, setError] = useState(null);
 
+    const fetchLinks = async () => {
+        try {
+            const queryParams = new URLSearchParams({
+                page,
+                limit: 10,
+                search: searchTerm,
+            });
+    
+            const res = await fetch(`${SERVER_BASE_URL}/api/links?${queryParams.toString()}`, {
+                method: "GET",
+                credentials: 'include',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+    
+            if (!res.ok) throw new Error('Failed to fetch');
+            const data = await res.json();
+            dispatch(setLinks(data.data.links));
+    
+            setPagination({
+                total: data.data.total,
+                page: data.data.page,
+                limit: data.data.limit,
+                totalPages: data.data.totalPages,
+                hasNext: data.data.hasNextPage,
+                hasPrev: data.data.hasPrevPage,
+            });
+        } catch (err) {
+            console.error('Error fetching links', err);
+        }
+    };
+
     useEffect(() => {
-        const fetchLinks = async () => {
-            try {
-                const queryParams = new URLSearchParams({
-                    page,
-                    limit: 10,
-                    search: searchTerm,
-                });
-    
-                const res = await fetch(`${SERVER_BASE_URL}/api/links?${queryParams.toString()}`, {
-                    method: "GET",
-                    credentials: 'include',
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-    
-                if (!res.ok) throw new Error('Failed to fetch');
-                const data = await res.json();
-                dispatch(setLinks(data.data.links));
-    
-                setPagination({
-                    total: data.data.total,
-                    page: data.data.page,
-                    limit: data.data.limit,
-                    totalPages: data.data.totalPages,
-                    hasNext: data.data.hasNextPage,
-                    hasPrev: data.data.hasPrevPage,
-                });
-            } catch (err) {
-                console.error('Error fetching links', err);
-            }
-        };
-    
         const debouncedFetch = debounce(fetchLinks, 300);
         debouncedFetch();
-    
         return () => debouncedFetch.cancel();
-    }, [dispatch, page, searchTerm]);
+    }, [page, searchTerm]);
 
     const openQrModal = async (shortCode) => {
         setLoadingQr(true);
@@ -119,7 +118,7 @@ export default function Dashboard() {
             <div className="overflow-x-auto rounded-lg shadow-md">
                 <table className="w-full table-auto bg-white border border-gray-200">
                     <thead>
-                        <tr className="bg-white text-gray-800 text-center"> {/* match table row background */}
+                        <tr className="bg-white text-gray-800 text-center">
                             <th className="p-3 border">Original URL</th>
                             <th className="p-3 border">Short URL</th>
                             <th className="p-3 border">Clicks</th>
@@ -132,14 +131,14 @@ export default function Dashboard() {
                         {links.map((link) => (
                             <tr key={link._id} className="text-center bg-white hover:bg-gray-100 transition">
                                 <td className="p-3 border break-all">{link.originalUrl}</td>
-                                <td className="p-3 border text-blue-600 underline">
-                                    <a
-                                        href={`${SERVER_BASE_URL}/${link.shortCode}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        /{link.shortCode}
-                                    </a>
+                                <td className="p-3 border text-blue-600 underline cursor-pointer"
+                                    onClick={() => {
+                                        window.open(`${SERVER_BASE_URL}/${link.shortCode}`, '_blank');
+                                        setTimeout(() => {
+                                            fetchLinks();
+                                        }, 1000); 
+                                    }}>
+                                    /{link.shortCode}
                                 </td>
                                 <td className="p-3 border">{link.totalClicks}</td>
                                 <td className="p-3 border">{new Date(link.createdAt).toLocaleDateString()}</td>

@@ -46,38 +46,54 @@ export default function CreateLink() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <form onSubmit={handleCreate} className="bg-white p-8 rounded shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">Create Short Link</h2>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[rgb(214,200,181)] p-6">
+            <div className="w-full max-w-md bg-white p-8 rounded shadow-md">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold">Create Short Link</h2>
+                    <button
+                        onClick={() => navigate('/dashboard')}
+                        className="bg-black text-white px-4 py-1 rounded hover:bg-gray-800 text-sm"
+                    >
+                        Back to Dashboard
+                    </button>
+                </div>
+
                 {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
                 {success && <p className="text-green-500 text-sm mb-4">{success}</p>}
 
-                <input
-                    type="url"
-                    placeholder="Original URL"
-                    value={originalUrl}
-                    onChange={(e) => setOriginalUrl(e.target.value)}
-                    required
-                    className="w-full px-4 py-2 mb-4 border rounded"
-                />
+                <form onSubmit={handleCreate}>
+                    <input
+                        type="url"
+                        placeholder="Original URL"
+                        value={originalUrl}
+                        onChange={(e) => setOriginalUrl(e.target.value)}
+                        required
+                        className="w-full px-4 py-2 mb-4 border rounded"
+                    />
 
-                <input
-                    type="text"
-                    placeholder="Custom Alias (optional)"
-                    value={customAlias}
-                    onChange={(e) => setCustomAlias(e.target.value)}
-                    className="w-full px-4 py-2 mb-4 border rounded"
-                />
+                    <input
+                        type="text"
+                        placeholder="Custom Alias (optional)"
+                        value={customAlias}
+                        onChange={(e) => setCustomAlias(e.target.value)}
+                        className="w-full px-4 py-2 mb-4 border rounded"
+                    />
 
-                <input
-                    type="date"
-                    value={expirationDate}
-                    onChange={(e) => setExpirationDate(e.target.value)}
-                    className="w-full px-4 py-2 mb-6 border rounded"
-                />
+                    <div className="mb-6">
+                        <label className="block mb-1 text-sm text-gray-700 text-left">Expiration Date (optional)</label>
+                        <input
+                            type="date"
+                            value={expirationDate}
+                            onChange={(e) => setExpirationDate(e.target.value)}
+                            className="w-full px-4 py-2 border rounded"
+                        />
+                    </div>
 
-                <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"> Create Link </button>
-            </form>
+                    <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                        Create Link
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }
