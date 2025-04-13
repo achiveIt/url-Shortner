@@ -73,6 +73,9 @@ export const getAllLinks = async (req, res, next) => {
     const userId = req.user.id;
 
     try {
+        const parsedPage = parseInt(page);
+        const parsedLimit = parseInt(limit);
+
         const query = {
             user: userId,
             $or: [
@@ -83,16 +86,20 @@ export const getAllLinks = async (req, res, next) => {
 
         const links = await ShortLink.find(query)
             .sort({ createdAt: -1 })
-            .skip((page - 1) * limit)
-            .limit(parseInt(limit));
+            .skip((parsedPage - 1) * parsedLimit)
+            .limit(parsedLimit);
 
         const count = await ShortLink.countDocuments(query);
+        const totalPages = Math.ceil(count / parsedLimit);
 
         const response = new ApiResponse(200, 'Links fetched successfully', {
             links,
             total: count,
-            page: parseInt(page),
-            limit: parseInt(limit)
+            page: parsedPage,
+            limit: parsedLimit,
+            totalPages,
+            hasNextPage: parsedPage < totalPages,
+            hasPrevPage: parsedPage > 1
         });
 
         return res.status(200).json(response);
