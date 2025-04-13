@@ -9,30 +9,49 @@ export default function Dashboard() {
     const links = useSelector((state) => state.links.allLinks);
     const navigate = useNavigate();
 
-    const [qrModalOpen, setQrModalOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const [pagination, setPagination] = useState({
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false
+    });
+
+    const [qrModelOpen, setQrModalOpen] = useState(false);
     const [qrData, setQrData] = useState(null);
     const [loadingQr, setLoadingQr] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchLinks = async () => {
-          try {
-            const res = await fetch(`${SERVER_BASE_URL}/api/links`, {
-                method: "GET",
-                credentials: 'include',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            if (!res.ok) throw new Error('Failed to fetch');
-            const data = await res.json();
-            dispatch(setLinks(data.data.links));
-          } catch (err) {
-            console.error('Error fetching links', err);
-          }
+            try {
+                const res = await fetch(`${SERVER_BASE_URL}/api/links?page=${page}&limit=10`, {
+                    method: "GET",
+                    credentials: 'include',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                if (!res.ok) throw new Error('Failed to fetch');
+                const data = await res.json();
+                dispatch(setLinks(data.data.links));
+
+                setPagination({
+                    total: data.data.total,
+                    page: data.data.page,
+                    limit: data.data.limit,
+                    totalPages: data.data.totalPages,
+                    hasNext: data.data.hasNextPage,
+                    hasPrev: data.data.hasPrevPage,
+                });
+            } catch (err) {
+                console.error('Error fetching links', err);
+            }
         };
         fetchLinks();
-    }, [dispatch]);
+    }, [dispatch, page]);
 
     const openQrModal = async (shortCode) => {
         setLoadingQr(true);
@@ -50,7 +69,7 @@ export default function Dashboard() {
         }
     };
 
-    const closeQrModal = () => {
+    const closeQrModel = () => {
         setQrModalOpen(false);
         setQrData(null);
         setError(null);
@@ -92,10 +111,7 @@ export default function Dashboard() {
                             <td className="p-2 border">{link.totalClicks}</td>
                             <td className="p-2 border">{new Date(link.createdAt).toLocaleDateString()}</td>
                             <td className="p-2 border">{link.expirationDate && new Date(link.expirationDate) < new Date() ? 'Expired' : 'Active'}</td>
-                            <td
-                                className="p-2 border text-blue-600 underline cursor-pointer"
-                                onClick={() => openQrModal(link.shortCode)}
-                            >
+                            <td className="p-2 border text-blue-600 underline cursor-pointer" onClick={() => openQrModal(link.shortCode)}>
                                 View QR
                             </td>
                         </tr>
@@ -103,13 +119,25 @@ export default function Dashboard() {
                 </tbody>
             </table>
 
-            {qrModalOpen && (
+            <div className="mt-4 flex justify-center items-center gap-4">
+                <button disabled={!pagination.hasPrev}
+                    onClick={() => setPage(page - 1)}
+                    className={`px-3 py-1 rounded ${pagination.hasPrev ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}>
+                    Previous
+                </button>
+                <span>Page {pagination.page} of {pagination.totalPages}</span>
+                <button disabled={!pagination.hasNext}
+                    onClick={() => setPage(page + 1)}
+                    className={`px-3 py-1 rounded ${pagination.hasNext ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}>
+                    Next
+                </button>
+            </div>
+
+            {qrModelOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg relative w-80">
-                        <button
-                            className="absolute top-2 right-3 text-gray-500 hover:text-black text-xl"
-                            onClick={closeQrModal}
-                        >
+                        <button className="absolute top-2 right-3 text-gray-500 hover:text-black text-xl"
+                            onClick={closeQrModel}>
                             &times;
                         </button>
                         <h2 className="text-xl font-semibold mb-4 text-center">Scan QR Code</h2>
@@ -121,12 +149,10 @@ export default function Dashboard() {
                             qrData && (
                                 <div className="flex flex-col items-center">
                                     <img src={qrData.qrCode} alt="QR Code" className="w-48 h-48" />
-                                    <a
-                                        href={qrData.shortUrl}
+                                    <a  href={qrData.shortUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="mt-3 text-blue-600 hover:underline text-sm break-all"
-                                    >
+                                        className="mt-3 text-blue-600 hover:underline text-sm break-all">
                                         {qrData.shortUrl}
                                     </a>
                                 </div>
