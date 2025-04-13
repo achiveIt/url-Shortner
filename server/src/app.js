@@ -9,7 +9,7 @@ import cors from 'cors'
 
 const app = express();
 const corsOptions = {
-    origin: 'https://complaint-system-client.vercel.app',
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'PATCH'], 
     credentials: true,               
   };
