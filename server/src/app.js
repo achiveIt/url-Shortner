@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import linkRoutes from './routes/linkRoute.js'
 import redirectRoutes from './routes/redirectRoute.js'
 import qrRoutes from './routes/qrRoute.js';
+import analyticsRoutes from './routes/analyticsRoute.js'
 import cors from 'cors'
 
 const app = express();
@@ -26,5 +27,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/links', linkRoutes);
 app.use('/', redirectRoutes);
 app.use('/api/qr', qrRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 export {app}
