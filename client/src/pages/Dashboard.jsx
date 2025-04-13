@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setLinks } from '../redux/slices/linkSlice';
 import { SERVER_BASE_URL } from '../../constants';
 import { useNavigate } from 'react-router-dom';
+import debounce from 'lodash.debounce';
 
 export default function Dashboard() {
     const dispatch = useDispatch();
     const links = useSelector((state) => state.links.allLinks);
     const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
 
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState({
@@ -27,17 +29,24 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchLinks = async () => {
             try {
-                const res = await fetch(`${SERVER_BASE_URL}/api/links?page=${page}&limit=10`, {
+                const queryParams = new URLSearchParams({
+                    page,
+                    limit: 10,
+                    search: searchTerm,
+                });
+    
+                const res = await fetch(`${SERVER_BASE_URL}/api/links?${queryParams.toString()}`, {
                     method: "GET",
                     credentials: 'include',
                     headers: {
                         "Content-Type": "application/json",
                     },
                 });
+    
                 if (!res.ok) throw new Error('Failed to fetch');
                 const data = await res.json();
                 dispatch(setLinks(data.data.links));
-
+    
                 setPagination({
                     total: data.data.total,
                     page: data.data.page,
@@ -50,8 +59,12 @@ export default function Dashboard() {
                 console.error('Error fetching links', err);
             }
         };
-        fetchLinks();
-    }, [dispatch, page]);
+    
+        const debouncedFetch = debounce(fetchLinks, 300);
+        debouncedFetch();
+    
+        return () => debouncedFetch.cancel();
+    }, [dispatch, page, searchTerm]);
 
     const openQrModal = async (shortCode) => {
         setLoadingQr(true);
@@ -80,6 +93,11 @@ export default function Dashboard() {
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold">Your Shortened Links</h1>
                 <div className="flex gap-3">
+                    <input type="text"
+                            placeholder="Search by keyword..."
+                            className="border px-3 py-1 rounded"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}/>
                     <button onClick={() => navigate('/analytics')} className="bg-blue-500 text-white px-4 py-1 rounded">
                         Analytics
                     </button>
