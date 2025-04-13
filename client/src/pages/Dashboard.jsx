@@ -2,10 +2,12 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLinks } from '../redux/slices/linkSlice';
 import { SERVER_BASE_URL } from '../../constants';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
     const dispatch = useDispatch();
     const links = useSelector((state) => state.links.allLinks);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchLinks = async () => {
@@ -39,7 +41,12 @@ export default function Dashboard() {
       }, [dispatch]);
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Your Shortened Links</h1>
+        <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold">Your Shortened Links</h1>
+            <button onClick={() => navigate('/create')} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Create New Link
+            </button>
+        </div>
         <table className="w-full table-auto border">
             <thead>
                 <tr className="bg-gray-200">
