@@ -43,6 +43,9 @@ export default function Dashboard() {
     <div className="p-6">
         <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold">Your Shortened Links</h1>
+            <button onClick={() => navigate('/analytics')} className="bg-blue-500 text-white px-4 py-1 rounded">
+                Analytics
+            </button>
             <button onClick={() => navigate('/create')} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 Create New Link
             </button>
