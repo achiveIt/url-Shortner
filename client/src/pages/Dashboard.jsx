@@ -89,73 +89,112 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">Your Shortened Links</h1>
-                <div className="flex gap-3">
-                    <input type="text"
-                            placeholder="Search by keyword..."
-                            className="border px-3 py-1 rounded"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}/>
-                    <button onClick={() => navigate('/analytics')} className="bg-blue-500 text-white px-4 py-1 rounded">
+        <div className="min-h-screen bg-beige p-6" style={{ backgroundColor: 'rgb(214,200,181)' }}>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <h1 className="text-3xl font-bold text-center w-full">📄 Your Shortened Links</h1>
+    
+                <div className="flex gap-3 items-center w-full md:w-auto justify-center md:justify-end">
+                    <input
+                        type="text"
+                        placeholder="Search by keyword..."
+                        className="bg-white border border-gray-300 px-4 py-2 rounded-md shadow-sm w-full md:w-64"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <button
+                        onClick={() => navigate('/analytics')}
+                        className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-md transition"
+                    >
                         Analytics
                     </button>
-                    <button onClick={() => navigate('/create')} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    <button
+                        onClick={() => navigate('/create')}
+                        className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-md transition"
+                    >
                         Create New Link
                     </button>
                 </div>
             </div>
-            <table className="w-full table-auto border">
-                <thead>
-                    <tr className="bg-gray-200 text-center">
-                        <th className="p-2 border">Original URL</th>
-                        <th className="p-2 border">Short URL</th>
-                        <th className="p-2 border">Clicks</th>
-                        <th className="p-2 border">Created</th>
-                        <th className="p-2 border">Status</th>
-                        <th className="p-2 border">QR Image</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {links.map((link) => (
-                        <tr key={link._id} className="text-center">
-                            <td className="p-2 border break-all">{link.originalUrl}</td>
-                            <td className="p-2 border text-blue-600 underline">
-                                <a href={`${SERVER_BASE_URL}/${link.shortCode}`} target="_blank" rel="noopener noreferrer">
-                                    /{link.shortCode}
-                                </a>
-                            </td>
-                            <td className="p-2 border">{link.totalClicks}</td>
-                            <td className="p-2 border">{new Date(link.createdAt).toLocaleDateString()}</td>
-                            <td className="p-2 border">{link.expirationDate && new Date(link.expirationDate) < new Date() ? 'Expired' : 'Active'}</td>
-                            <td className="p-2 border text-blue-600 underline cursor-pointer" onClick={() => openQrModal(link.shortCode)}>
-                                View QR
-                            </td>
+    
+            <div className="overflow-x-auto rounded-lg shadow-md">
+                <table className="w-full table-auto bg-white border border-gray-200">
+                    <thead>
+                        <tr className="bg-white text-gray-800 text-center"> {/* match table row background */}
+                            <th className="p-3 border">Original URL</th>
+                            <th className="p-3 border">Short URL</th>
+                            <th className="p-3 border">Clicks</th>
+                            <th className="p-3 border">Created</th>
+                            <th className="p-3 border">Status</th>
+                            <th className="p-3 border">QR Image</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            <div className="mt-4 flex justify-center items-center gap-4">
-                <button disabled={!pagination.hasPrev}
+                    </thead>
+                    <tbody>
+                        {links.map((link) => (
+                            <tr key={link._id} className="text-center bg-white hover:bg-gray-100 transition">
+                                <td className="p-3 border break-all">{link.originalUrl}</td>
+                                <td className="p-3 border text-blue-600 underline">
+                                    <a
+                                        href={`${SERVER_BASE_URL}/${link.shortCode}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        /{link.shortCode}
+                                    </a>
+                                </td>
+                                <td className="p-3 border">{link.totalClicks}</td>
+                                <td className="p-3 border">{new Date(link.createdAt).toLocaleDateString()}</td>
+                                <td className="p-3 border">
+                                    {link.expirationDate && new Date(link.expirationDate) < new Date()
+                                        ? 'Expired'
+                                        : 'Active'}
+                                </td>
+                                <td
+                                    className="p-3 border text-blue-600 underline cursor-pointer"
+                                    onClick={() => openQrModal(link.shortCode)}
+                                >
+                                    View QR
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+    
+            <div className="mt-6 flex justify-center items-center gap-6">
+                <button
+                    disabled={!pagination.hasPrev}
                     onClick={() => setPage(page - 1)}
-                    className={`px-3 py-1 rounded ${pagination.hasPrev ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}>
+                    className={`px-4 py-2 rounded-md transition ${
+                        pagination.hasPrev
+                            ? 'bg-black text-white hover:bg-gray-800'
+                            : 'bg-black text-white cursor-not-allowed'
+                    }`}
+                >
                     Previous
                 </button>
-                <span>Page {pagination.page} of {pagination.totalPages}</span>
-                <button disabled={!pagination.hasNext}
+                <span className="text-gray-700 font-medium">
+                    Page {pagination.page} of {pagination.totalPages}
+                </span>
+                <button
+                    disabled={!pagination.hasNext}
                     onClick={() => setPage(page + 1)}
-                    className={`px-3 py-1 rounded ${pagination.hasNext ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}>
+                    className={`px-4 py-2 rounded-md transition ${
+                        pagination.hasNext
+                            ? 'bg-black text-white hover:bg-gray-800'
+                            : 'bg-black text-white cursor-not-allowed'
+                    }`}
+                >
                     Next
                 </button>
             </div>
-
+    
             {qrModelOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg relative w-80">
-                        <button className="absolute top-2 right-3 text-gray-500 hover:text-black text-xl"
-                            onClick={closeQrModel}>
+                        <button
+                            className="absolute top-2 right-3 text-gray-500 hover:text-black text-xl"
+                            onClick={closeQrModel}
+                        >
                             &times;
                         </button>
                         <h2 className="text-xl font-semibold mb-4 text-center">Scan QR Code</h2>
@@ -167,10 +206,12 @@ export default function Dashboard() {
                             qrData && (
                                 <div className="flex flex-col items-center">
                                     <img src={qrData.qrCode} alt="QR Code" className="w-48 h-48" />
-                                    <a  href={qrData.shortUrl}
+                                    <a
+                                        href={qrData.shortUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="mt-3 text-blue-600 hover:underline text-sm break-all">
+                                        className="mt-3 text-blue-600 hover:underline text-sm break-all text-center"
+                                    >
                                         {qrData.shortUrl}
                                     </a>
                                 </div>
