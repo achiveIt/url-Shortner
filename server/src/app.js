@@ -8,13 +8,19 @@ import qrRoutes from './routes/qrRoute.js';
 import cors from 'cors'
 
 const app = express();
+const corsOptions = {
+    origin: 'https://complaint-system-client.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'PATCH'], 
+    credentials: true,               
+  };
 
-app.use(cors());
-app.use(express.json({limit:"16kb"}));
 app.use(cookieParser());
+app.use(cors(corsOptions));
+app.use(express.json({limit:"16kb"}));
+
 
 app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/links', linkRoutes);
