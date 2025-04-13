@@ -10,6 +10,7 @@ export default function Dashboard() {
     const links = useSelector((state) => state.links.allLinks);
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true);
 
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState({
@@ -28,6 +29,7 @@ export default function Dashboard() {
 
     const fetchLinks = async () => {
         try {
+            setLoading(true);
             const queryParams = new URLSearchParams({
                 page,
                 limit: 10,
@@ -56,6 +58,8 @@ export default function Dashboard() {
             });
         } catch (err) {
             console.error('Error fetching links', err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -92,7 +96,7 @@ export default function Dashboard() {
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                 <h1 className="text-3xl font-bold text-center w-full">📄 Your Shortened Links</h1>
     
-                <div className="flex gap-3 items-center w-full md:w-auto justify-center md:justify-end">
+                <div className="flex gap-3 items-center w-full md:w-auto justify-center md:justify-end flex-wrap">
                     <input
                         type="text"
                         placeholder="Search by keyword..."
@@ -112,52 +116,67 @@ export default function Dashboard() {
                     >
                         Create New Link
                     </button>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-md transition"
+                    >
+                        Back to Login
+                    </button>
                 </div>
             </div>
     
-            <div className="overflow-x-auto rounded-lg shadow-md">
-                <table className="w-full table-auto bg-white border border-gray-200">
-                    <thead>
-                        <tr className="bg-white text-gray-800 text-center">
-                            <th className="p-3 border">Original URL</th>
-                            <th className="p-3 border">Short URL</th>
-                            <th className="p-3 border">Clicks</th>
-                            <th className="p-3 border">Created</th>
-                            <th className="p-3 border">Status</th>
-                            <th className="p-3 border">QR Image</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {links.map((link) => (
-                            <tr key={link._id} className="text-center bg-white hover:bg-gray-100 transition">
-                                <td className="p-3 border break-all">{link.originalUrl}</td>
-                                <td className="p-3 border text-blue-600 underline cursor-pointer"
-                                    onClick={() => {
-                                        window.open(`${SERVER_BASE_URL}/${link.shortCode}`, '_blank');
-                                        setTimeout(() => {
-                                            fetchLinks();
-                                        }, 1000); 
-                                    }}>
-                                    /{link.shortCode}
-                                </td>
-                                <td className="p-3 border">{link.totalClicks}</td>
-                                <td className="p-3 border">{new Date(link.createdAt).toLocaleDateString()}</td>
-                                <td className="p-3 border">
-                                    {link.expirationDate && new Date(link.expirationDate) < new Date()
-                                        ? 'Expired'
-                                        : 'Active'}
-                                </td>
-                                <td
-                                    className="p-3 border text-blue-600 underline cursor-pointer"
-                                    onClick={() => openQrModal(link.shortCode)}
-                                >
-                                    View QR
-                                </td>
+            {loading ? (
+                <div className="text-center py-10 flex justify-center items-center gap-2">
+                    <span className="animate-spin rounded-full h-6 w-6 border-t-2 border-black" />
+                    <span className="text-gray-700 text-lg">Loading links...</span>
+                </div>
+            ) : (
+                <div className="overflow-x-auto rounded-lg shadow-md">
+                    <table className="w-full table-auto bg-white border border-gray-200">
+                        <thead>
+                            <tr className="bg-white text-gray-800 text-center">
+                                <th className="p-3 border">Original URL</th>
+                                <th className="p-3 border">Short URL</th>
+                                <th className="p-3 border">Clicks</th>
+                                <th className="p-3 border">Created</th>
+                                <th className="p-3 border">Status</th>
+                                <th className="p-3 border">QR Image</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {links.map((link) => (
+                                <tr key={link._id} className="text-center bg-white hover:bg-gray-100 transition">
+                                    <td className="p-3 border break-all">{link.originalUrl}</td>
+                                    <td
+                                        className="p-3 border text-blue-600 underline cursor-pointer"
+                                        onClick={() => {
+                                            window.open(`${SERVER_BASE_URL}/${link.shortCode}`, '_blank');
+                                            setTimeout(() => {
+                                                fetchLinks();
+                                            }, 1000);
+                                        }}
+                                    >
+                                        /{link.shortCode}
+                                    </td>
+                                    <td className="p-3 border">{link.totalClicks}</td>
+                                    <td className="p-3 border">{new Date(link.createdAt).toLocaleDateString()}</td>
+                                    <td className="p-3 border">
+                                        {link.expirationDate && new Date(link.expirationDate) < new Date()
+                                            ? 'Expired'
+                                            : 'Active'}
+                                    </td>
+                                    <td
+                                        className="p-3 border text-blue-600 underline cursor-pointer"
+                                        onClick={() => openQrModal(link.shortCode)}
+                                    >
+                                        View QR
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
     
             <div className="mt-6 flex justify-center items-center gap-6">
                 <button

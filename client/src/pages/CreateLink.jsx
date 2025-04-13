@@ -8,12 +8,14 @@ export default function CreateLink() {
     const [expirationDate, setExpirationDate] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleCreate = async (e) => {
         e.preventDefault();
         setError('');
         setSuccess('');
+        setLoading(true);
 
         try {
             const res = await fetch(`${SERVER_BASE_URL}/api/links/`, {
@@ -42,6 +44,8 @@ export default function CreateLink() {
             setTimeout(() => navigate('/dashboard'), 1500);
         } catch (err) {
             setError(err.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -89,8 +93,12 @@ export default function CreateLink() {
                         />
                     </div>
 
-                    <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-                        Create Link
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full py-2 rounded text-white ${loading ? 'bg-gray-500' : 'bg-blue-600 hover:bg-blue-700'}`}
+                    >
+                        {loading ? 'Creating Link...' : 'Create Link'}
                     </button>
                 </form>
             </div>
